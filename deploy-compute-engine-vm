@@ -1,0 +1,34 @@
+#!/bin/bash -eu
+# Setup a logging funcion to simplify stdout using "echo"
+log() {
+	echo "$*"
+}
+
+# Setup a failure funcion to handle failed steps in the script
+# NOTE: it might be overkill for such a simple script
+failure() {
+	log "!!!"
+	log "!!! [create-gce-vm] FAILED"
+	log "!!! $*"
+	log "!!!"
+	exit 1
+}
+
+log "Running ..."
+if [[ -z "$PROJECT_ID" ]]; then
+	failure "PROJECT_ID appears to be empty. Ensure it is set as environment variable"
+fi
+
+log "Creating VM instance ..."
+gcloud compute --project="$PROJECT_ID" instances create bamboo-server \
+               --zone=europe-west1 \
+							 --machine-type=f1-micro \
+							 --metadata-from-file startup-script=./bamboo-startup \
+               --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
+               --image=debian-10-buster-v20220621 \
+               --image-project=debian-cloud \
+               --boot-disk-size=10GB \
+               --boot-disk-type=pd-balanced \
+               --boot-disk-device-name=bamboo-instance
+
+log "VM created."
