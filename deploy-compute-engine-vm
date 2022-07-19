@@ -1,17 +1,17 @@
 #!/bin/bash -eu
 # Setup a logging funcion to simplify stdout using "echo"
 log() {
-	echo "$*"
+  echo "$*"
 }
 
 # Setup a failure funcion to handle failed steps in the script
 # NOTE: it might be overkill for such a simple script
 failure() {
-	log "!!!"
-	log "!!! [create-gce-vm] FAILED"
-	log "!!! $*"
-	log "!!!"
-	exit 1
+  log "!!!"
+  log "!!! [create-gce-vm] FAILED"
+  log "!!! $*"
+  log "!!!"
+  exit 1
 }
 
 log "Running ..."
