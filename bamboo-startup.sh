@@ -1,26 +1,40 @@
 #!/bin/bash -eu
 # Setup a logging funcion to simplify stdout using "echo"
 log() {
-	echo "[startup-script] $*"
+  echo "[startup-script] $*"
 }
 
 PROJECT_ID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
 
 log "Creating bamboo instance in $PROJECT_ID ..."
 
-log "Setting up depenencies (Java) ..."
-# Install Java as required for Bamboo
-apt-get update -y
-apt install -y openjdk-8-jdk
+log "Setting up depenencies .."
 
-log "Java installed ..."
+# Install missing packages
+sudo apt-get install -y software-properties-common
+
+log "Installing wget ..."
+sudo apt-get update -y
+sudo apt-get install -y wget
+
+log "Installing Java ..."
+# Update debian reference to be able to download java version 8
+# jdk-8 is not available from apg-get in debian 10 (buster)
+wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+
+# Install Java as required for Bamboo
+sudo apt-get update -y
+sudo apt-get install -y adoptopenjdk-8-hotspot
+
+log "Java installed"
 
 log "Setting up Bamboo ..."
 # Switch /opt directory
 cd /opt
 
 # Download the latest version of Bamboo
-log "Fetching Bamboo v8.1.8 archive"
+log "Fetching Bamboo v8.1.8 archive ..."
 sudo wget https://www.atlassian.com/software/bamboo/downloads/binary/atlassian-bamboo-8.1.8.tar.gz
 
 log "Unzipping archive ..."
