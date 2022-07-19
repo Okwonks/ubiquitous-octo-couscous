@@ -14,10 +14,11 @@ If there's any problem running a script, please create an issue discribing the p
 
 ## Usage
 
-From the root folder:
-	```sh
-	export PROJECT_ID=<your-gcp-project-id> && ./deploy-compute-engine-vm
-	```
+From the root folder
+
+```bash
+export PROJECT_ID=<your-gcp-project-id> && ./deploy-compute-engine-vm
+```
 
 ## License
 
