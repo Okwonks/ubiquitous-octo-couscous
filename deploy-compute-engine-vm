@@ -8,7 +8,7 @@ log() {
 # NOTE: it might be overkill for such a simple script
 failure() {
   log "!!!"
-  log "!!! [create-gce-vm] FAILED"
+  log "!!! [deploy-compute-engine-vm] FAILED"
   log "!!! $*"
   log "!!!"
   exit 1
@@ -23,7 +23,7 @@ log "Creating VM instance ..."
 gcloud compute --project="$PROJECT_ID" instances create bamboo-server \
                --zone=europe-west1-b \
                --machine-type=e2-custom-4-4096 \
-               --metadata-from-file startup-script=./bamboo-startup \
+               --metadata-from-file startup-script=./bamboo-startup.sh \
                --network-interface=network-tier=PREMIUM,subnet=default \
                --maintenance-policy=MIGRATE \
                --provisioning-model=STANDARD \
@@ -37,3 +37,15 @@ gcloud compute --project="$PROJECT_ID" instances create bamboo-server \
                --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
 
 log "VM created."
+
+log "Setting up firewall rules ..."
+
+gcloud compute --project="$PROJECT_ID" firewall-rules create default-allow-http-8085 \
+               --allow tcp:8085 \
+               --source-ranges 0.0.0.0/0 \
+               --target-tags http-server \
+               --description "Allow port 8085 (Bamboo) access to http-server"
+
+log "Firewall rule created"
+
+log "[deploy-compute-engine-vm] Done."
